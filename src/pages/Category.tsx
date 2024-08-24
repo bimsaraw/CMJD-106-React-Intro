@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CategoryType from "../types/CategoryType";
 
 function Category() {
@@ -12,9 +12,13 @@ function Category() {
         setCategories(response.data);
     }
 
+    useEffect(function () {
+        loadCategories(); //function that will be trigerred at the side effect  
+    }, []) //dependency array, if it is empty, it will be trigerred only once
+
     function handleCategoryName(event: any) {
         setCategoryName(event.target.value);
-    } 
+    }
 
     async function handleSubmit() {
         const data = {
@@ -26,26 +30,29 @@ function Category() {
     }
 
     return (
-        <div>
-            <h1>Categories</h1>
-            <button onClick={loadCategories}>Load Categories</button>
+        <div className="container mx-auto pt-5 pb-5">
+
+            <h1 className="text-3xl font-semibold mb-5 text-slate-900">Categories</h1>
 
             {categories && categories.map(function (category: CategoryType) {
                 return (
-                    <div>
+                    <div className="text-slate-600 border border-slate-200 rounded-lg mb-3 p-3 shadow-lg inline-block me-3">
                         {category.name}
                     </div>
                 )
             })
             }
 
-            <h2>Create Category</h2>
-            <form>
-                <label>Category Name</label>
-                <input type="text" onChange={handleCategoryName} required/>
+            <h2 className="text-xl text-slate-900 font-medium mb-3 mt-5">Create Category</h2>
 
-                <button type="button" onClick={handleSubmit}>Create Category</button>
-            </form>
+            <div className="border border-slate-200 py-3 px-4 rounded-lg max-w-[350px]">
+                <form>
+                    <label className="text-slate-600 font-sm block mb-2">Category Name</label>
+                    <input type="text" className="text-slate-600 font-sm block mb-3 w-full p-2 border border-slate-300 rounded-lg" onChange={handleCategoryName} required />
+
+                    <button type="button" className="py-3 px-4 bg-slate-800 text-white rounded-lg hover:bg-slate-950 mb-2 text-sm" onClick={handleSubmit}>Create Category</button>
+                </form>
+            </div>
         </div>
     )
 }
