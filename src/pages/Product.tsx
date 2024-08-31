@@ -66,6 +66,49 @@ function Product() {
         }
     }
 
+    const [productEditing, setProductEditing] = useState<ProductType | null>(null);
+
+    function editProduct(product: ProductType) {
+        setProductEditing(product);
+        setProductName(product.name);
+        setPrice(product.price);
+        setDescription(product.description);
+        setCategoryId(product.category?.id);
+    }
+
+    async function updateProduct() {
+        const data = {
+            name: productName,
+            price: price,
+            description: description,
+            categoryId: categoryId
+        }
+
+        try {
+            await axios.put(`http://localhost:8081/products/${productEditing?.id}`, data);
+            setProductEditing(null);
+
+            loadProducts();
+
+            setProductName("");
+            setPrice(0);
+            setDescription("");
+            setCategoryId(0);
+            
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function deleteProduct(productId: number) {
+        try {
+            await axios.delete(`http://localhost:8081/products/${productId}`);
+            loadProducts();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="container mx-auto pt-5 pb-5">
             <h1 className="text-3xl font-semibold mb-5">Products</h1>
@@ -86,7 +129,13 @@ function Product() {
                                 <td>{product.id}</td>
                                 <td>{product.name}</td>
                                 <td>{product.price}</td>
-                                <td></td>
+                                <td>
+                                    <button onClick={() => editProduct(product)} className="bg-slate-200 text-slate-600 px-2 py-1 rounded-lg hover:bg-slate-300">Edit</button>
+
+                                    <button onClick={() => deleteProduct(product.id)} className="bg-red-400 text-white rounded-lg px-2 py-1 hover:bg-red-500">
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
                         )
                     })}
@@ -113,7 +162,7 @@ function Product() {
 
                     <div>
                         <label className="text-slate-600 font-sm block mb-2">Category</label>
-                        <select className="text-slate-600 font-sm block mb-3 w-full p-2 border border-slate-300 rounded-lg" onChange={handleCategoryId} required>
+                        <select className="text-slate-600 font-sm block mb-3 w-full p-2 border border-slate-300 rounded-lg" value={categoryId} onChange={handleCategoryId} required>
                             <option value="">Please select category</option>
                             {categories.map(function (category) {
                                 return (
@@ -123,7 +172,18 @@ function Product() {
                         </select>
                     </div>
 
-                    <button type="button" className="py-3 px-4 bg-slate-800 text-white rounded-lg hover:bg-slate-950 mb-2 text-sm" onClick={handleSubmit}>Create Product</button>
+                    {productEditing ? (
+                        <>
+                            <button type="button" className="py-3 px-4 bg-slate-800 text-white rounded-lg hover:bg-slate-950 mb-2 text-sm" onClick={updateProduct}>Update Product</button>
+                        </>
+                    ) : (
+                        <>
+                            <button type="button" className="py-3 px-4 bg-slate-800 text-white rounded-lg hover:bg-slate-950 mb-2 text-sm" onClick={handleSubmit}>Create Product</button>
+                        </>
+                    )}
+
+
+                    
                 </form>
             </div>
 
