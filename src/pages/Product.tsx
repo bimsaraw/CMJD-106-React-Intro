@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import ProductType from "../types/ProductType";
 import axios from "axios";
 import CategoryType from "../types/CategoryType";
+import { useAuth } from "../context/AuthContext";
 
 function Product() {
+
+    const { isAuthenticated, jwtToken } = useAuth();
 
     const [products, setProducts] = useState<ProductType[]>([]);
 
@@ -15,20 +18,29 @@ function Product() {
 
     const [categories, setCategories] = useState<CategoryType[]>([]);
 
+    const config = {
+        headers: {
+            Authorization: `Bearer ${jwtToken}`
+        }
+    }
+
     async function loadProducts() {
-        const response = await axios.get("http://localhost:8081/products")
+        const response = await axios.get("http://localhost:8081/products", config)
         setProducts(response.data);
     }
 
     async function loadCategories() {
-        const response = await axios.get("http://localhost:8081/categories"); //it takes 23ms for this API request
+        const response = await axios.get("http://localhost:8081/categories", config); //it takes 23ms for this API request
         setCategories(response.data);
     }
 
     useEffect(function () {
-        loadProducts();
-        loadCategories();
-    }, [])
+
+        if (isAuthenticated) {
+            loadProducts();
+            loadCategories();
+        }
+    }, [isAuthenticated])
 
     function handleProductName(event: any) {
         setProductName(event.target.value);
@@ -94,7 +106,7 @@ function Product() {
             setPrice(0);
             setDescription("");
             setCategoryId(0);
-            
+
         } catch (error) {
             console.log(error);
         }
@@ -183,7 +195,7 @@ function Product() {
                     )}
 
 
-                    
+
                 </form>
             </div>
 

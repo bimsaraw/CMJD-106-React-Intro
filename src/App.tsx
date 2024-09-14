@@ -8,22 +8,33 @@ import Category from './pages/Category'
 import Product from './pages/Product'
 import Order from './pages/orders/Order'
 import CreateOrder from './pages/orders/CreateOrder'
+import { AuthProvider } from './context/AuthContext'
+import Login from './pages/auth/Login'
+import ProtectedRoute from './components/ProtectedRoute'
 
 
 //parent component
 function App() { //functional component
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/category" element={<Category />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/order" element={<Order />} />
-        <Route path="/order/create" element={<CreateOrder />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Protected routes - need login to access */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/category" element={<Category />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/order" element={<Order />} />
+            <Route path="/order/create" element={<CreateOrder />} />
+          </Route>
+
+          {/* Open route */}
+          <Route path="/auth/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 
 }

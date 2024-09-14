@@ -1,20 +1,31 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import CategoryType from "../types/CategoryType";
+import { useAuth } from "../context/AuthContext";
 
 function Category() {
+
+    const { isAuthenticated, jwtToken } = useAuth();
 
     const [categories, setCategories] = useState<CategoryType[]>([]);
     const [categoryName, setCategoryName] = useState<string>("");
 
+    const config = {
+        headers: {
+            Authorization: `Bearer ${jwtToken}`
+        }
+    }
+
     async function loadCategories() {
-        const response = await axios.get("http://localhost:8081/categories"); //it takes 23ms for this API request
+        const response = await axios.get("http://localhost:8081/categories", config); //it takes 23ms for this API request
         setCategories(response.data);
     }
 
     useEffect(function () {
-        loadCategories(); //function that will be trigerred at the side effect  
-    }, []) //dependency array, if it is empty, it will be trigerred only once
+        if (isAuthenticated) {
+            loadCategories(); //function that will be trigerred at the side effect  
+        }
+    }, [isAuthenticated]) //dependency array, if it is empty, it will be trigerred only once
 
     function handleCategoryName(event: any) {
         setCategoryName(event.target.value);
@@ -24,7 +35,7 @@ function Category() {
         const data = {
             name: categoryName
         }
-        const response = await axios.post("http://localhost:8081/categories", data);
+        const response = await axios.post("http://localhost:8081/categories", data, config);
         console.log(response);
         loadCategories();
     }
